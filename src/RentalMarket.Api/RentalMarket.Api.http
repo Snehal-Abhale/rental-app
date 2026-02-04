@@ -1,0 +1,6 @@
+@RentalMarket.Api_HostAddress = http://localhost:5181
+
+GET {{RentalMarket.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

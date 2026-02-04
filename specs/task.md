@@ -1,0 +1,36 @@
+# Rental Marketplace - Project Tasks
+
+- [ ] **Phase 0: Prerequisites & Setup** <!-- id: 0 -->
+    - [ ] Install .NET 8 SDK (Verify with `dotnet --version`) <!-- id: 1 -->
+    - [ ] Install Docker Desktop/OrbStack (Verify with `docker ps`) <!-- id: 2 -->
+    - [ ] Install VS Code Extensions (C# Dev Kit, Docker, SQL Server) <!-- id: 3 -->
+- [ ] **Phase 1: Foundation & Clean Architecture** <!-- id: 4 -->
+    - [ ] Initialize Git Repo (`git init`) & Create `.gitignore` <!-- id: 5 -->
+    - [] Create Solution File (`dotnet new sln`) <!-- id: 6 -->
+    - [ ] Create Projects (Api, Application, Domain, Infrastructure, UnitTests) <!-- id: 7 -->
+    - [ ] Add Project References (Link Layer Dependencies) <!-- id: 8 -->
+    - [ ] Add Projects to Solution (`dotnet sln add ...`) <!-- id: 9 -->
+    - [ ] Create `docker-compose.yml` (SQL Server, Redis) & Start Containers <!-- id: 10 -->
+    - [ ] Create `Listing` Entity (Domain) <!-- id: 11 -->
+    - [ ] Create `ApplicationDbContext` (Infrastructure) & `IListingRepository` (Application) <!-- id: 12 -->
+    - [ ] Create `ListingsController` (Api) with Basic CRUD <!-- id: 13 -->
+    - [ ] Setup Swagger/OpenAPI <!-- id: 14 -->
+    - [ ] Configure GitHub Actions for CI <!-- id: 15 -->
+- [ ] **Phase 2: Auth & Roles** <!-- id: 16 -->
+    - [ ] Add Identity Packages & Configure Service <!-- id: 17 -->
+    - [ ] Implement JWT Token Generation <!-- id: 18 -->
+    - [ ] Create Login/Register Endpoints <!-- id: 19 -->
+    - [ ] Apply `[Authorize]` attributes & Role Checks <!-- id: 20 -->
+- [ ] **Phase 3: Booking Domain (Concurrency)** <!-- id: 21 -->
+    - [ ] Define Booking Entities <!-- id: 22 -->
+    - [ ] Write SQL Stored Procedure for Atomic Booking <!-- id: 23 -->
+    - [ ] Implement Booking Service using Stored Proc <!-- id: 24 -->
+    - [ ] Write Parallel Tests to verify Race Condition handling <!-- id: 25 -->
+- [ ] **Phase 4: Search & Performance** <!-- id: 26 -->
+    - [ ] Create Search DTOs <!-- id: 27 -->
+    - [ ] Implement Read-Optimized Dapper Queries <!-- id: 28 -->
+    - [ ] Implement Redis Caching using Decorator Pattern <!-- id: 29 -->
+- [ ] **Phase 5: Advanced Architecture (CQRS)** <!-- id: 30 -->
+    - [ ] detailed subtasks to be refined later... <!-- id: 31 -->
+- [ ] **Phase 6: Real-time & Polish** <!-- id: 32 -->
+    - [ ] detailed subtasks to be refined later... <!-- id: 33 -->

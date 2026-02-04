@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  sql-server:
+    image: mcr.microsoft.com/azure-sql-edge
+    container_name: rental_sql
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+    ports:
+      - "1433:1433"
+
+  redis:
+    image: redis:alpine
+    container_name: rental_redis
+    ports:
+      - "6379:6379"
