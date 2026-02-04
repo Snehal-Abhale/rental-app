@@ -1,0 +1,33 @@
+name: .NET Core Build & Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout your code
+    - uses: actions/checkout@v4
+
+    # 2. Setup .NET 8 on the server
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    # 3. Restore dependencies
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # 4. Build (Compilation)
+    - name: Build
+      run: dotnet build --no-restore
+
+    # 5. Run Unit Tests (Important!)
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
