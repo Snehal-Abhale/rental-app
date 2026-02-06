@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using RentalMarket.Application.Listings;
 using RentalMarket.Domain.Entities;
-
+using Microsoft.AspNetCore.Authorization;
 namespace RentalMarket.Api.Controllers;
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -30,6 +31,7 @@ public class ListingsController : ControllerBase
         return Ok(listing);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(Listing listing, CancellationToken ct)
     {
