@@ -40,4 +40,11 @@ public class ListingsController : ControllerBase
         await _repository.AddAsync(listing, ct);
         return CreatedAtAction(nameof(GetById), new { id = listing.Id }, listing);
     }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] decimal? maxPrice, CancellationToken ct)
+    {
+        var listings = await _repository.SearchAsync(maxPrice, ct);
+        return Ok(listings);                     
+    }
 }

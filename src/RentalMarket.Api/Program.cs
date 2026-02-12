@@ -15,6 +15,11 @@ builder.WebHost.UseUrls("http://localhost:5246");
 
 // 1. Add Controllers
 builder.Services.AddControllers();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "RentalMarket_";
+});
 
 // 2. Database
 var connectionString = "Server=localhost,1433;Database=RentalDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;";
@@ -43,7 +48,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // 5. Dependency Injection
-builder.Services.AddScoped<IListingRepository, ListingRepository>();
+// Register the REAL repository so the Cached one can find it
+builder.Services.AddScoped<ListingRepository>();
+
+// Register the CACHED repository as the one to use internally
+builder.Services.AddScoped<IListingRepository, CachedListingRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>(); // Wired up!
 

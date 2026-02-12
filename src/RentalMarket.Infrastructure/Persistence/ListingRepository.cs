@@ -32,4 +32,15 @@ public class ListingRepository : IListingRepository
         await _context.Listings.AddAsync(listing, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
     }
+    public async Task<IEnumerable<Listing>> SearchAsync(decimal? maxPrice, CancellationToken ct)
+    {
+        IQueryable<Listing> query = _context.Listings;
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(l => l.PricePerNight <= maxPrice.Value);
+        }
+
+        return await query.ToListAsync(ct);
+    }
 }
