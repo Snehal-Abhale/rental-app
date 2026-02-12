@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RentalMarket.Application.Auth;
 using RentalMarket.Application.Listings;
+using RentalMarket.Application.Bookings;
 using RentalMarket.Domain.Entities;
 using RentalMarket.Infrastructure.Auth;
 using RentalMarket.Infrastructure.Persistence;
@@ -43,6 +44,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // 5. Dependency Injection
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>(); // Wired up!
 
 // 6. Swagger
