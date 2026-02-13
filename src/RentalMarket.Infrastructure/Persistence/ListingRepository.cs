@@ -1,8 +1,11 @@
 using System;
+using Dapper;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RentalMarket.Application.Listings;
 using RentalMarket.Domain.Entities;
 
@@ -11,11 +14,15 @@ namespace RentalMarket.Infrastructure.Persistence;
 public class ListingRepository : IListingRepository
 {
     private readonly ApplicationDbContext _context;
+    private readonly string _connectionString;
 
-    public ListingRepository(ApplicationDbContext context)
+    public ListingRepository(ApplicationDbContext context, IConfiguration configuration)
     {
         _context = context;
+        _connectionString = configuration.GetConnectionString("DefaultConnection")!;
     }
+
+    
 
     public async Task<IEnumerable<Listing>> GetAllAsync(CancellationToken cancellationToken)
     {
@@ -32,15 +39,17 @@ public class ListingRepository : IListingRepository
         await _context.Listings.AddAsync(listing, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
     }
-    public async Task<IEnumerable<Listing>> SearchAsync(decimal? maxPrice, CancellationToken ct)
+     public async Task<IEnumerable<SearchListingDto>> SearchAsync(decimal? maxPrice, CancellationToken ct)
     {
-        IQueryable<Listing> query = _context.Listings;
-
+        using var connection = new SqlConnection(_connectionString);
+        
+        var sql = "SELECT Id, Title, PricePerNight, Location FROM Listings WHERE 1=1";
+        
         if (maxPrice.HasValue)
         {
-            query = query.Where(l => l.PricePerNight <= maxPrice.Value);
+            sql += " AND PricePerNight <= @MaxPrice";
         }
-
-        return await query.ToListAsync(ct);
+        // Dapper Magic! 🪄
+        return await connection.QueryAsync<SearchListingDto>(sql, new { MaxPrice = maxPrice });
     }
 }

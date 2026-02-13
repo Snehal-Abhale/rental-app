@@ -103,3 +103,28 @@ We used a **Stored Procedure** with `SET TRANSACTION ISOLATION LEVEL SERIALIZABL
     *   `IF EXISTS (...) THROW Error`.
     *   `INSERT INTO ...`.
     *   All wrapped in a Transaction.
+
+---
+
+## Phase 4: Search & Performance
+
+### 1. Redis Caching
+*   **What is it?**: An in-memory key-value store. It is much faster than SQL Server (Microseconds vs Milliseconds).
+*   **Why use it?**: To store data that is requested often but changes rarely (like Listing Details).
+*   **Distributed Cache**: `IDistributedCache` in .NET allows us to swap Redis for SQL Cache or Memory Cache easily.
+
+### 2. The Decorator Pattern (Proxy Pattern)
+This is a **Key Interview Concept**.
+*   **Problem**: We want to add Caching to `ListingRepository`, but we don't want to clutter the SQL logic with Redis code.
+*   **Solution**: Create a `CachedListingRepository` that implements the SAME interface (`IListingRepository`).
+*   **How it works**:
+    1.  The `CachedRepo` takes the `RealRepo` in its constructor.
+    2.  When `GetById` is called, `CachedRepo` checks Redis.
+    3.  If missing, it calls `RealRepo.GetById` (fetch from SQL).
+    4.  It saves the result to Redis and returns it.
+*   **Dependency Injection**: In `Program.cs`, we register the Decorator (`CachedListingRepository`) as the default implementation for `IListingRepository`. The Controller doesn't even know it's talking to a cache!
+
+### 3. Search & Filtering
+*   **IQueryable**: We use `IQueryable` to build the SQL query dynamically *before* sending it to the database.
+*   **Where Clause**: `query.Where(l => l.Price <= maxPrice)` translates to `WHERE Price <= 100` in SQL.
+*   **Execution**: The SQL is only sent when we call `ToListAsync()`. This is called **Deferred Execution**.

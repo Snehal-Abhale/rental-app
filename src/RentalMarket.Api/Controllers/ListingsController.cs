@@ -42,7 +42,7 @@ public class ListingsController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] decimal? maxPrice, CancellationToken ct)
+    public async Task<ActionResult<IEnumerable<SearchListingDto>>> Search([FromQuery] decimal? maxPrice, CancellationToken ct)
     {
         var listings = await _repository.SearchAsync(maxPrice, ct);
         return Ok(listings);                     

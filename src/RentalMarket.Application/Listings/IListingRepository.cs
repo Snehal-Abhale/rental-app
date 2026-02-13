@@ -10,5 +10,7 @@ public interface IListingRepository
     Task<IEnumerable<Listing>> GetAllAsync(CancellationToken cancellationToken);
     Task<Listing?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task AddAsync(Listing listing, CancellationToken cancellationToken);
-    Task<IEnumerable<Listing>> SearchAsync(decimal? maxPrice, CancellationToken ct);
+    // Change this line:
+     Task<IEnumerable<SearchListingDto>> SearchAsync(decimal? maxPrice, CancellationToken ct);
+
 }
