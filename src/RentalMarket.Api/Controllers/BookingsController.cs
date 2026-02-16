@@ -4,6 +4,8 @@ using RentalMarket.Application.Bookings;
 using RentalMarket.Application.Listings;
 using RentalMarket.Domain.Entities;
 using System.Security.Claims;
+using MediatR;
+using RentalMarket.Domain.Events;
 
 namespace RentalMarket.Api.Controllers;
 
@@ -14,11 +16,23 @@ public class BookingsController : ControllerBase
 {
     private readonly IBookingRepository _bookingRepo;
     private readonly IListingRepository _listingRepo;
+    private readonly IMediator _mediator; 
 
-    public BookingsController(IBookingRepository bookingRepo, IListingRepository listingRepo)
+
+    public BookingsController(IBookingRepository bookingRepo, IListingRepository listingRepo, IMediator mediator)
     {
         _bookingRepo = bookingRepo;
         _listingRepo = listingRepo;
+        _mediator = mediator;
+    }
+
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
+    {
+        // Simple placeholder for now. 
+        // In a real app we'd fetch this from Repo, but for now just return OK to fix compilation.
+        return Ok(new { Id = id, Status = "Confirmed" });
     }
 
     [HttpPost]
@@ -67,7 +81,9 @@ public class BookingsController : ControllerBase
         {
             // 6. Save (Repository handles Concurrency checks)
             await _bookingRepo.AddBookingAsync(booking, ct);
-            return CreatedAtAction(nameof(Create), new { id = booking.Id }, new { BookingId = booking.Id, TotalPrice = totalPrice });
+            await _mediator.Publish(new BookingCreatedEvent(booking.Id, "snehalabhale93@gmail.com"), ct); // TODO: Get real email from User
+            return CreatedAtAction(nameof(GetById), new { id = booking.Id }, booking);
+
         }
         catch (InvalidOperationException ex) // Catch the Double Booking error
         {

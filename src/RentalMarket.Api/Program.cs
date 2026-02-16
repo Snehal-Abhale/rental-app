@@ -9,12 +9,15 @@ using RentalMarket.Domain.Entities;
 using RentalMarket.Infrastructure.Auth;
 using RentalMarket.Infrastructure.Persistence;
 using System.Text;
+using RentalMarket.Application.Bookings.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://localhost:5246");
 
 // 1. Add Controllers
 builder.Services.AddControllers();
+// MediatR (CQRS)
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(RentalMarket.Application.Listings.IListingRepository).Assembly));
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
@@ -55,6 +58,7 @@ builder.Services.AddScoped<ListingRepository>();
 builder.Services.AddScoped<IListingRepository, CachedListingRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>(); // Wired up!
+builder.Services.AddScoped<IEmailService, RentalMarket.Infrastructure.Services.SmtpEmailService>();
 
 // 6. Swagger
 builder.Services.AddEndpointsApiExplorer();

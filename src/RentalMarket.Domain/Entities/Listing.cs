@@ -7,4 +7,5 @@ public class Listing
     public string Description { get; set; } = string.Empty;
     public decimal PricePerNight { get; set; }
     public string Location { get; set; } = string.Empty;
+    public int Bedrooms { get; set; }
 }
