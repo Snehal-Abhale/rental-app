@@ -51,9 +51,9 @@ public async Task<IActionResult> Create(CreateListingCommand command, Cancellati
 }
 
     [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<SearchListingDto>>> Search([FromQuery] decimal? maxPrice, CancellationToken ct)
+    public async Task<ActionResult<IEnumerable<SearchListingDto>>> Search([FromQuery] decimal? maxPrice, [FromQuery] string? q, CancellationToken ct)
     {
-        var listings = await _repository.SearchAsync(maxPrice, ct);
+        var listings = await _repository.SearchAsync(maxPrice, q, ct);
         return Ok(listings);                     
     }
 }

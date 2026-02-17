@@ -6,6 +6,7 @@ using RentalMarket.Domain.Entities;
 using System.Security.Claims;
 using MediatR;
 using RentalMarket.Domain.Events;
+using RentalMarket.Application.Common.Interfaces;
 
 namespace RentalMarket.Api.Controllers;
 
@@ -17,13 +18,14 @@ public class BookingsController : ControllerBase
     private readonly IBookingRepository _bookingRepo;
     private readonly IListingRepository _listingRepo;
     private readonly IMediator _mediator; 
+    private readonly IPaymentGateway _paymentGateway;
 
-
-    public BookingsController(IBookingRepository bookingRepo, IListingRepository listingRepo, IMediator mediator)
+    public BookingsController(IBookingRepository bookingRepo, IListingRepository listingRepo, IMediator mediator, IPaymentGateway paymentGateway)
     {
         _bookingRepo = bookingRepo;
         _listingRepo = listingRepo;
         _mediator = mediator;
+        _paymentGateway = paymentGateway;
     }
 
 
@@ -66,7 +68,14 @@ public class BookingsController : ControllerBase
             return Unauthorized();
         }
 
-        // 5. Create Entity
+        // 5. Process Payment (Mock)
+        var paymentSuccess = await _paymentGateway.ProcessPaymentAsync(totalPrice, "USD");
+        if (!paymentSuccess)
+        {
+            return BadRequest("Payment failed.");
+        }
+
+        // 6. Create Entity
         var booking = new Booking
         {
             Id = Guid.NewGuid(),

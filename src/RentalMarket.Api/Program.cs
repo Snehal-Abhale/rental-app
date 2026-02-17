@@ -10,12 +10,27 @@ using RentalMarket.Infrastructure.Auth;
 using RentalMarket.Infrastructure.Persistence;
 using System.Text;
 using RentalMarket.Application.Bookings.Events;
+using RentalMarket.Application.Common.Interfaces;
+using RentalMarket.Api.Services;
+using RentalMarket.Api.Hubs;
+using RentalMarket.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://localhost:5246");
 
 // 1. Add Controllers
 builder.Services.AddControllers();
+
+// Enable CORS for SignalR Client
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder
+            .SetIsOriginAllowed((host) => true)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
 // MediatR (CQRS)
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(RentalMarket.Application.Listings.IListingRepository).Assembly));
 builder.Services.AddStackExchangeRedisCache(options =>
@@ -49,6 +64,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
     });
+    builder.Services.AddSignalR(); // For Real-time Notifications (SignalR)
 
 // 5. Dependency Injection
 // Register the REAL repository so the Cached one can find it
@@ -59,6 +75,8 @@ builder.Services.AddScoped<IListingRepository, CachedListingRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>(); // Wired up!
 builder.Services.AddScoped<IEmailService, RentalMarket.Infrastructure.Services.SmtpEmailService>();
+builder.Services.AddScoped<INotificationService, SignalRNotificationService>();
+builder.Services.AddScoped<IPaymentGateway, StripeMockPaymentGateway>();
 
 // 6. Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -91,6 +109,9 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// 0. CORS (First!)
+app.UseCors("AllowAll");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -103,6 +124,8 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Use CORS (Must be after Auth, before MapControllers)
+app.MapHub<NotificationHub>("/notificationHub"); // Map SignalR Hub
 app.MapControllers();
 
 // DB Init

@@ -39,7 +39,7 @@ public class ListingRepository : IListingRepository
         await _context.Listings.AddAsync(listing, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
     }
-     public async Task<IEnumerable<SearchListingDto>> SearchAsync(decimal? maxPrice, CancellationToken ct)
+     public async Task<IEnumerable<SearchListingDto>> SearchAsync(decimal? maxPrice, string? searchTerm, CancellationToken ct)
     {
         using var connection = new SqlConnection(_connectionString);
         
@@ -49,7 +49,15 @@ public class ListingRepository : IListingRepository
         {
             sql += " AND PricePerNight <= @MaxPrice";
         }
+        
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            sql += " AND (Title LIKE @SearchTerm OR Location LIKE @SearchTerm)";
+            // Add % wildcards for LIKE clause
+            searchTerm = $"%{searchTerm}%";
+        }
+
         // Dapper Magic! 🪄
-        return await connection.QueryAsync<SearchListingDto>(sql, new { MaxPrice = maxPrice });
+        return await connection.QueryAsync<SearchListingDto>(sql, new { MaxPrice = maxPrice, SearchTerm = searchTerm });
     }
 }

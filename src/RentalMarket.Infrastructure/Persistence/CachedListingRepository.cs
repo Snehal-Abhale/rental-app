@@ -53,9 +53,9 @@ public class CachedListingRepository: IListingRepository
         return listing;
     }
 
-    public Task<IEnumerable<SearchListingDto>> SearchAsync(decimal? maxPrice, CancellationToken ct)
+    public Task<IEnumerable<SearchListingDto>> SearchAsync(decimal? maxPrice, string? searchTerm, CancellationToken ct)
     {
-        return _decorated.SearchAsync(maxPrice, ct);
+        return _decorated.SearchAsync(maxPrice, searchTerm, ct);
     }
 
   
